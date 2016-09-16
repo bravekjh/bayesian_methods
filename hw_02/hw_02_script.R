@@ -24,8 +24,20 @@ for(i in 1:11)
 plot(vec, fill_vec, type = "o")
 
 
-(gamma(58)*gamma(44)) / gamma(102)
 
 #3.1 part c
 
+# compute the posterior probability of theta
 
+constant <- (gamma(58)*gamma(44)) / gamma(102)
+
+(theta <- seq(0,1,0.1)) # prior theta values
+fill_vec <- rep(0,length(theta)) # posterior theta estimates
+
+three.three <- function(tht)
+{
+  one <- tht^57
+  two <- (1 - tht)^57
+  three <- one * two
+  
+}
