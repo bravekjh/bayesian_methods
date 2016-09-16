@@ -45,10 +45,39 @@ three.three <- function(tht)
 for(i in 1:length(theta))
 {
   input <- three.three(theta[i])
-  print(theta[i])
-  print(input)
+  #print(theta[i])
+  #print(input)
   
   fill_vec[i] <- input
 }
 
 plot(theta, fill_vec, type="o")
+
+# 3.1 part d
+
+theta <- seq(0,1,length.out = 1000)
+fill.vec <- rep(0,1000)
+   
+three.four <- function(tht)
+{
+  one <- tht^57
+  two <- (1 - tht)^57
+  three <- (one * two) / constant
+  print(three)
+}
+
+for(i in 1:length(theta))
+{
+  input <- three.four(theta[i])
+  fill.vec[i] <- input
+}
+
+plot(theta, fill.vec, type="o")
+
+
+# 3.1 part e
+
+x <- seq(0,1,length.out = 1000)
+y <- dbeta(x = x, shape1 = 58, shape2 = 44)
+
+plot(x,y)
