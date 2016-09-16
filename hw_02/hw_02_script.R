@@ -38,6 +38,17 @@ three.three <- function(tht)
 {
   one <- tht^57
   two <- (1 - tht)^57
-  three <- one * two
-  
+  three <- (one * two) / constant
+  print(three)
 }
+
+for(i in 1:length(theta))
+{
+  input <- three.three(theta[i])
+  print(theta[i])
+  print(input)
+  
+  fill_vec[i] <- input
+}
+
+plot(theta, fill_vec, type="o")
