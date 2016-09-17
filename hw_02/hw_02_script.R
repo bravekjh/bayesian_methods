@@ -159,5 +159,74 @@ plot(n.0.set, posterior.output, type = "l")
 
 # 3.4 part a
 
+# try out a bunch of theta values from 0 to 1
+theta <- seq(0,1,length.out = 1000)
+
+# p(theta) ~ beta(2,8) prior
+a <- 2 ; b <- 8
+y <- 15; n <- 43
+
+p.theta <- dbeta(x = theta, a, b)
+
+plot(theta, p.theta, type = "l", col = "blue") # looks p.good
+
+# p(y|theta) ~ (theta^15) * (1 - theta)^(43-15)
+p.y.theta <- choose(n, y) * (theta^y) * (1 - theta)^(n - y)
+
+lines(theta, p.y.theta, type="l", col = "red")
+
+# posterior distribution
+p.theta.y <- dbeta(theta, a + y, b + n - y)
+
+lines(theta, p.theta.y, type="l")
+
+# find the posterior mean, mode, sd
+
+# beta mean is (a / a + b)
+(a + y) / (a + y + b + n - y)
+
+# beta mode is (a - 1) / [ (a - 1) + (b - 1)]
+(a + y - 1) / ( ( a + y - 1) + (b + n - y - 1) )
+
+# beta variance is (ab) / ( (a + b + 1)(a + b)^2 )
+beta.var <- ((a + y)*(b + n - y)) / ((a + y + b + n - y + 1)*(a + y + b + n - y)^2)
+sqrt(beta.var)
+
+qbeta(c(0.025, 0.975), a + y, b + n - y)
+
+
+# 3.4.b - repeat part a but for a beta(8, 2) prior
+
+# p(theta) ~ beta(2,8) prior
+a <- 8 ; b <- 2
+y <- 15; n <- 43
+
+p.theta <- dbeta(x = theta, a, b)
+
+plot(theta, p.theta, type = "l", col = "blue") # looks p.good
+
+# p(y|theta) ~ (theta^15) * (1 - theta)^(43-15)
+p.y.theta <- choose(n, y) * (theta^y) * (1 - theta)^(n - y)
+
+lines(theta, p.y.theta, type="l", col = "red")
+
+# posterior distribution
+p.theta.y <- dbeta(theta, a + y, b + n - y)
+
+lines(theta, p.theta.y, type="l")
+
+# find the posterior mean, mode, sd
+
+# beta mean is (a / a + b)
+(a + y) / (a + y + b + n - y)
+
+# beta mode is (a - 1) / [ (a - 1) + (b - 1)]
+(a + y - 1) / ( ( a + y - 1) + (b + n - y - 1) )
+
+# beta variance is (ab) / ( (a + b + 1)(a + b)^2 )
+beta.var <- ((a + y)*(b + n - y)) / ((a + y + b + n - y + 1)*(a + y + b + n - y)^2)
+sqrt(beta.var)
+
+qbeta(c(0.025, 0.975), a + y, b + n - y)
 
 
