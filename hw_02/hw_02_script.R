@@ -197,6 +197,8 @@ qbeta(c(0.025, 0.975), a + y, b + n - y)
 
 # 3.4.b - repeat part a but for a beta(8, 2) prior
 
+theta <- seq(0,1,length.out = 1000)
+
 # p(theta) ~ beta(2,8) prior
 a <- 8 ; b <- 2
 y <- 15; n <- 43
@@ -229,4 +231,46 @@ sqrt(beta.var)
 
 qbeta(c(0.025, 0.975), a + y, b + n - y)
 
+
+# 3.4.c
+
+# plot the mixture distribution with the provided density function
+
+theta <- seq(0,1,length.out = 1000)
+
+  part.1 <- (1 / 4)
+  part.2 <- (gamma(10) / (gamma(2) * gamma(8))) 
+  part.3 <- ( ((3 * theta) * (1 - theta)^7) + ((theta^7) * (1  - theta)  )   )
+prior.theta <- part.1 * part.2 * part.3
+
+plot(theta, prior.theta, type="l", ylim=c(0,4))
+
+p.theta.1 <- dbeta(theta, 2, 8)
+p.theta.2 <- dbeta(theta, 8, 2)
+
+lines(theta, p.theta.1, col = "blue")
+lines(theta, p.theta.2, col = "red")
+
+
+# 3.4.d.iii - plot the posterior for a variety of theta values
+
+theta <- seq(0,1,length.out = 1000)
+
+# first get the prior specified
+prior.1 <- (1 / 4)
+prior.2 <- (gamma(10) / (gamma(2) * gamma(8))) 
+prior.3 <- ( ((3 * theta) * (1 - theta)^7) + ((theta^7) * (1  - theta)  )   )
+
+prior.theta <- prior.1 * prior.2 * prior.3
+
+# now specify the likelihood function
+
+like.theta <- choose(43, 15) * (theta^15)* ((1 - theta)^28)
+
+posterior <- prior.theta * like.theta
+
+plot(theta, posterior, type = "l")
+
+# find the approximate posterior mode - should be the top of the density curve
+max(posterior)
 
