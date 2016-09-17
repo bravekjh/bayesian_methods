@@ -129,4 +129,35 @@ sum.y.b <- sum(y.b)
 
 qgamma(c(0.025,0.975), (sum.y.b + b.a), (b.b + n.b) )
 
+# compute and plot the posterior expectations of theta.b under a prior with 
+# theta.b ~ gamma(12 * n.0 , n.0), for n.0 in {0, ... , 50}
+
+# create a function
+
+n.0.set <- seq(1,50, by = 1)
+posterior.output <- rep(0, length(n.0.set))
+
+post.gamma <- function(n.0)
+{
+  b.a <- (12 * n.0)
+  b.b <- n.0
+  n.b <- length(y.b)
+  sum.y.b <- sum(y.b)
+  
+  # posterior expectation = mean = (a / b) = (sum.y.b + b.a) / (b.b + n.b)
+  post.gamma.output <- (sum.y.b + b.a) / (b.b + n.b)
+  return(post.gamma.output)
+}
+
+for(i in 1:length(n.0.set))
+{
+  posterior.output[i] <- post.gamma(n.0.set[i])
+}
+
+plot(n.0.set, posterior.output, type = "l")
+
+
+# 3.4 part a
+
+
 
