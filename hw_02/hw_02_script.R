@@ -6,7 +6,7 @@ three.one <- function(x)
   one <- x^57
   two <- (1-x)^43
   three <- one*two
-  print(three)
+  return(three)
 }
 
 vec <- seq(0,1,0.1)
@@ -21,7 +21,11 @@ for(i in 1:11)
   fill_vec[i] <- input
   }
 
-plot(vec, fill_vec, type = "o")
+plot(vec, fill_vec, type = "o"
+    , main = expression(paste("3.1.b Plot - Density as function of ", theta))
+    , xlab = expression(theta)
+    , ylab = expression(paste("Density(", theta, ")"))  
+    )
 
 
 
@@ -37,9 +41,9 @@ fill_vec <- rep(0,length(theta)) # posterior theta estimates
 three.three <- function(tht)
 {
   one <- tht^57
-  two <- (1 - tht)^57
+  two <- (1 - tht)^43
   three <- (one * two) / constant
-  print(three)
+  return(three)
 }
 
 for(i in 1:length(theta))
@@ -51,19 +55,25 @@ for(i in 1:length(theta))
   fill_vec[i] <- input
 }
 
-plot(theta, fill_vec, type="o")
+fill_vec
+plot(theta, fill_vec, type="o"
+     , main = expression(paste("3.1.c Plot - Density as function of ", theta))
+     , ylab = expression(paste("p(", theta, "|", y, ")"))
+     , xlab = expression(theta)       
+     )
 
 # 3.1 part d
 
 theta <- seq(0,1,length.out = 1000)
 fill.vec <- rep(0,1000)
-   
+constant <- (gamma(58)*gamma(44)) / gamma(102)
+
 three.four <- function(tht)
 {
   one <- tht^57
-  two <- (1 - tht)^57
+  two <- (1 - tht)^43
   three <- (one * two) / constant
-  print(three)
+  return(three)
 }
 
 for(i in 1:length(theta))
@@ -72,16 +82,27 @@ for(i in 1:length(theta))
   fill.vec[i] <- input
 }
 
-plot(theta, fill.vec, type="o")
-
+plot(theta, fill.vec, type="l"
+     , main = expression(paste("3.1.d Plot - Density as function of ", theta))
+     , ylab = expression(paste("p(", theta, "|", y, ")"))
+     , xlab = expression(theta)            
+     )
+mtext("Using Uniform Prior")
 
 # 3.1 part e
 
 x <- seq(0,1,length.out = 1000)
 y <- dbeta(x = x, shape1 = 58, shape2 = 44)
 
-plot(x,y)
+plot(x,y, type = "l"
+     , main = expression(paste("3.1.e Plot - Density as function of ", theta))
+     , ylab = expression(paste("p(", theta, "|", y, ")"))
+     , xlab = expression(theta)                 
+     )
+mtext("Using Beta Distribution for Posterior")
 
+which(y==max(y))
+x[570]
 
 # 3.3 part a
 
