@@ -338,7 +338,7 @@ theta[element]
 
 # 3.7 part a
 # plotting the posterior density of theta
-
+ 
 theta <- seq(0,1, length.out = 1000)
 
 posterior <- dbeta(theta, 3, 14)
