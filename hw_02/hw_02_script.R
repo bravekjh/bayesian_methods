@@ -183,7 +183,7 @@ plot(n.0.set, posterior.output, type = "l"
     , xlab = expression(n)
     , ylab = expression(paste("p(", theta, "|", y, ")"))
      )
-
+t 
 max(posterior.output)
 # 3.4 part a
 
@@ -196,17 +196,29 @@ y <- 15; n <- 43
 
 p.theta <- dbeta(x = theta, a, b)
 
-plot(theta, p.theta, type = "l", col = "blue") # looks p.good
+plot(theta, p.theta, type = "l", col = "blue"
+     , main = expression(paste("Plot of p(", theta, ")"))
+     , xlab = expression(theta)
+     , ylab = expression(paste("p(", theta, ")"))
+     ) # looks p.good
 
 # p(y|theta) ~ (theta^15) * (1 - theta)^(43-15)
-p.y.theta <- choose(n, y) * (theta^y) * (1 - theta)^(n - y)
+p.y.theta <- (theta^y) * (1 - theta)^(n - y)
 
-lines(theta, p.y.theta, type="l", col = "red")
+plot(theta, p.y.theta, type="l", col = "red"
+     , main = expression(paste("Plot of p(y|", theta, ")"))
+     , xlab = expression(theta)
+     , ylab = expression(paste("p(y|", theta, ")"))     
+     )
 
 # posterior distribution
 p.theta.y <- dbeta(theta, a + y, b + n - y)
 
-lines(theta, p.theta.y, type="l")
+plot(theta, p.theta.y, type="l"
+     , main = expression(paste("Plot of ", theta, "|y"))
+     , xlab = expression(theta)
+     , ylab = expression(paste("p(", theta, "|y)"))          
+     )
 
 # find the posterior mean, mode, sd
 
@@ -233,17 +245,29 @@ y <- 15; n <- 43
 
 p.theta <- dbeta(x = theta, a, b)
 
-plot(theta, p.theta, type = "l", col = "blue") # looks p.good
+plot(theta, p.theta, type = "l", col = "blue"
+     , main = expression(paste("Plot of p(", theta, ")"))
+     , xlab = expression(theta)
+     , ylab = expression(paste("p(", theta, ")"))
+     ) # looks p.good
 
 # p(y|theta) ~ (theta^15) * (1 - theta)^(43-15)
 p.y.theta <- choose(n, y) * (theta^y) * (1 - theta)^(n - y)
 
-lines(theta, p.y.theta, type="l", col = "red")
+plot(theta, p.y.theta, type="l", col = "red"
+     , main = expression(paste("Plot of p(y|", theta, ")"))
+     , xlab = expression(theta)
+     , ylab = expression(paste("p(y|", theta, ")"))     
+     )
 
 # posterior distribution
 p.theta.y <- dbeta(theta, a + y, b + n - y)
 
-lines(theta, p.theta.y, type="l")
+plot(theta, p.theta.y, type="l"
+     , main = expression(paste("Plot of ", theta, "|y"))
+     , xlab = expression(theta)
+     , ylab = expression(paste("p(", theta, "|y)"))           
+     )
 
 # find the posterior mean, mode, sd
 
@@ -271,14 +295,18 @@ theta <- seq(0,1,length.out = 1000)
   part.3 <- ( ((3 * theta) * (1 - theta)^7) + ((theta^7) * (1  - theta)  )   )
 prior.theta <- part.1 * part.2 * part.3
 
-plot(theta, prior.theta, type="l", ylim=c(0,4))
+plot(theta, prior.theta, type="l", ylim=c(0,4)
+     , main = expression(paste("Mixture Distribution"))
+     , xlab = expression(theta)
+     , ylab = expression(paste("p(", theta, "|y)"))                
+     )
 
 p.theta.1 <- dbeta(theta, 2, 8)
 p.theta.2 <- dbeta(theta, 8, 2)
 
 lines(theta, p.theta.1, col = "blue")
 lines(theta, p.theta.2, col = "red")
-
+mtext("Blue = beta(2,8); Red = beta(8,2")
 
 # 3.4.d.iii - plot the posterior for a variety of theta values
 
@@ -293,15 +321,20 @@ prior.theta <- prior.1 * prior.2 * prior.3
 
 # now specify the likelihood function
 
-like.theta <- choose(43, 15) * (theta^15)* ((1 - theta)^28)
+like.theta <- (theta^15)* ((1 - theta)^28)
 
 posterior <- prior.theta * like.theta
 
-plot(theta, posterior, type = "l")
+plot(theta, posterior, type = "l"
+     , main = expression(paste("posterior distribution"))
+     , xlab = expression(theta)
+     , ylab = expression(paste("p(", theta, "|y)"))      
+     )
+mtext(expression(paste(p(theta), "*", "p(y|",theta, ")")  ))
 
 # find the approximate posterior mode - should be the top of the density curve
-max(posterior)
-
+element <- which(posterior == max(posterior))
+theta[element]
 
 # 3.7 part a
 # plotting the posterior density of theta
