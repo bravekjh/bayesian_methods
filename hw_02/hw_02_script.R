@@ -343,6 +343,45 @@ theta <- seq(0,1, length.out = 1000)
 
 posterior <- dbeta(theta, 3, 14)
 
-plot(theta, posterior, type="l")
+plot(theta, posterior, type="l"
+     , main = expression(paste("3.7.a - posterior distribution"))
+     , xlab = expression(theta)
+     , ylab = expression(paste("p(", theta, "|y)"))      
+          )
 
+# 3.7.c plot the function obtained in 3.7.c
+
+pot.values <- seq(0,289, by = 1)
+output.vector <- rep(0, length(pot.values))
+# the gamma function was out of range for this, so I am changing to log scale
+
+
+pred.posterior <- function(y2)
+{
+  part.1 <- (lgamma(17) / (lgamma(3)*lgamma(14)))
+  part.2 <- (lgamma(1 + y2)*lgamma(12 + 278 - y2)) / lgamma(13 + 278)
+  part.3 <- part.1 * part.2
+  return(part.3)
+}
+
+for(i in 1:length(pot.values))
+{
+  input <- pred.posterior(pot.values[i])
+  output.vector[i] <- input
+}
+
+plot(pot.values, output.vector, type = "l"
+     , main = "Plot for 3.7.c"
+     )
+
+# Find the mean and sd of the function
+element <- which(output.vector == max(output.vector))
+pot.values[element]
+var(pot.values)
+
+# 3.7.d
+
+plot(pot.values, output.vector, type = "l"
+     , main = "Plot for 3.7.d"
+)
 
