@@ -31,3 +31,31 @@ legend(0.35, 7.5
 
 mean(county.1 < county.2)
 
+
+
+# Question 4.2
+# Part A
+
+y.a <- c(12,9,12,14,13,13,15,8,15,6)
+y.b <- c(11,11,10,9,9,8,7,10,6,8,8,9,7)
+
+n.a <- length(y.a)
+n.b <- length(y.b)
+
+a.a <- 120; b.a <- 10
+a.b <- 12; b.b <- 1
+
+sum.a <- sum(y.a)
+sum.b <- sum(y.b)
+
+
+species.a <- rgamma(n = 5000, (a.a + sum.a), (b.a + n.a) )
+species.b <- rgamma(n = 5000, (a.b + sum.b) , (b.b + n.b) )
+
+plot(density(species.a), col="darkgreen", lwd = 2, xlim = c(6,15))
+lines(density(species.b), col = "darkorange3", lwd = 2)
+
+mean(species.b < species.a)
+
+
+
