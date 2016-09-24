@@ -57,5 +57,27 @@ lines(density(species.b), col = "darkorange3", lwd = 2)
 
 mean(species.b < species.a)
 
+# 4.2.B
+# The actual vector length of y.b is 13, so I will work exercise for 
+# length(y.b) belonging to [11,15]
 
+# will use some of the global vars created above - the posterior
+# for theta.a uses the same prior, so species.a will remain constant
 
+# let's just use a loop from 1:20
+
+loop.n <- 50
+output.vec <- rep(0,loop.n)
+
+for(i in 1:loop.n)
+{
+loop.a <- 12 * i
+loop.b <- i
+set.seed(i*2)
+species.b <- rgamma(n = 5000, (loop.a + sum.b) , (loop.b + n.b) )
+output.obj <- mean(species.b < species.a)
+output.vec[i] <- output.obj
+}
+
+summary(output.vec)
+plot(density(output.vec))
