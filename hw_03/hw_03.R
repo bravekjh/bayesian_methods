@@ -81,3 +81,47 @@ output.vec[i] <- output.obj
 
 summary(output.vec)
 plot(density(output.vec))
+
+
+# 4.2.c
+# Repeat the previous two questions, using posterior predictive distributions
+
+# again using the global.vars from above, take random draws from our posterior
+
+# repeating part A
+species.a <- rgamma(n = 5000, (a.a + sum.a), (b.a + n.a) )
+species.b <- rgamma(n = 5000, (a.b + sum.b) , (b.b + n.b) )
+
+# now, use those theta values to take a random draw from a poisson distribution
+# recall that poisson was the likelihood function of our data
+
+species.a.pred <- rpois(5000, species.a)
+species.b.pred <- rpois(5000, species.b)
+
+mean(species.b.pred < species.a.pred)
+
+# repeating part B
+
+species.a <- rgamma(n = 5000, (a.a + sum.a), (b.a + n.a) )
+species.a.pred <- rpois(5000, species.a)
+
+loop.n <- 50
+output.vec <- rep(0,loop.n)
+
+for(i in 1:loop.n)
+{
+  loop.a <- 12 * i
+  loop.b <- i
+  set.seed(i*2)
+  species.b <- rgamma(n = 5000, (loop.a + sum.b) , (loop.b + n.b) )
+  species.b.pred <- rpois(5000, species.b)
+  
+  output.obj <- mean(species.b.pred < species.a.pred)
+  output.vec[i] <- output.obj
+}
+
+summary(output.vec)
+
+# same kind of result as with 4.2.b - once the prior gets out of control 
+# your results shift pretty dramatically
+
