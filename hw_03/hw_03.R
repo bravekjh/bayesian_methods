@@ -125,3 +125,80 @@ summary(output.vec)
 # same kind of result as with 4.2.b - once the prior gets out of control 
 # your results shift pretty dramatically
 
+
+
+# 4.8
+# Part A
+# First, read in the data from the two sets
+# use scan function since 
+
+bach <- scan(
+  file = "C:/Users/Philip/Schools/TAMU/STAT_638/Homework_Assignments/HW_03/menchild30bach.dat"
+  )
+
+no.bach <- scan(
+  file = "C:/Users/Philip/Schools/TAMU/STAT_638/Homework_Assignments/HW_03/menchild30nobach.dat"
+)
+
+
+# let's take a look - poisson dist (count data) so use a barchart
+barplot(table(no.bach))
+barplot(table(bach))
+
+# we are going to use a gamma(2,1) prior for each of these things
+
+
+n.bach <- length(bach); n.no.bach <- length(no.bach)
+a.bach <- 2; b.bach <- 1
+a.no.bach <- 2; b.no.bach <- 1
+
+sum.bach <- sum(bach); sum.no.bach <- sum(no.bach)
+
+# calculate the posteriors
+
+bach.post <- rgamma(n = 5000, (a.bach + sum.bach), (b.bach + n.bach))
+no.bach.post <- rgamma(n = 5000, (a.no.bach + sum.no.bach), (b.no.bach + n.no.bach))
+
+# use those in a poisson to finish our posterior predictive distribution
+bach.pred <- rpois(5000, bach.post)
+no.bach.pred <- rpois(5000, no.bach.post)
+
+barplot(table(bach.pred))
+barplot(table(no.bach.pred))
+
+
+
+# 4.8.B
+# Find 95% quantile-based posterior confidence intervals for 
+# (theta.b - theta.a) and (Y.b - Y.a) 
+
+theta.diff <- (no.bach.post - bach.post)
+plot(density(theta.diff))
+quantile(theta.diff, c(0.025, 0.975))
+
+pred.diff <- (no.bach.pred - bach.pred)
+barplot(table(pred.diff))
+quantile(pred.diff, c(0.025, 0.975))
+
+
+# 4.8.C
+# The empirical distribution will just be the bar chart from above
+barplot(table(no.bach))
+
+# Let's do some draws with theta.hat = 1.4
+
+compare <- rpois(n = length(no.bach), 1.4)
+
+input <- as.matrix(rbind(table(no.bach), table(compare)))
+barplot(input, beside = T, col = c("dodgerblue3", "darkolivegreen"))
+
+legend(10, 75
+       , c("Empirical", "Simulation") 
+       , lty = c(1,1)
+       , lwd = c(5,5)
+       , c("dodgerblue3", "darkolivegreen")
+)
+
+# Not the best fit - notice the difference in relative frequency on one and two
+
+
