@@ -201,4 +201,22 @@ legend(10, 75
 
 # Not the best fit - notice the difference in relative frequency on one and two
 
+# 4.8.d
+# for each of the 5000 theta.b values (no.bach.post object), sample 
+# 218 poisson random variables, and count the number of 0's and 1's
+
+count.0.output <- rep(0, length(no.bach.post))
+count.1.output <- rep(0, length(no.bach.post))
+
+for(i in 1:length(no.bach.post))
+{
+input <- rpois(218, lambda = no.bach.post[i])
+count.0 <- length(input[which(input==0)])
+count.1 <- length(input[which(input==1)])
+count.0.output[i] <- count.0
+count.1.output[i] <- count.1
+}
+
+plot(count.0.output, count.1.output)
+cor(count.0.output, count.1.output)
 
