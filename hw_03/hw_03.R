@@ -1,6 +1,5 @@
 #homework 03 R script
 
-
 # Question 4.1
 # With a uniform (beta(1,1)) prior, County 1's posterior is beta(57, 43)
 
@@ -31,8 +30,6 @@ legend(0.35, 7.5
 
 mean(county.1 < county.2)
 
-
-
 # Question 4.2
 # Part A
 
@@ -48,7 +45,7 @@ a.b <- 12; b.b <- 1
 sum.a <- sum(y.a)
 sum.b <- sum(y.b)
 
-
+# Conduct the sampling - 5000 realizations for each of these
 species.a <- rgamma(n = 5000, (a.a + sum.a), (b.a + n.a) )
 species.b <- rgamma(n = 5000, (a.b + sum.b) , (b.b + n.b) )
 
@@ -81,7 +78,14 @@ output.vec[i] <- output.obj
 
 summary(output.vec)
 plot(density(output.vec))
+output.vec
 
+plot(output.vec
+     , main = expression(paste("Pr(", theta, ".b < ", theta, ".a)"))
+     , xlab = "n.o values"
+     , ylab = expression(paste("Pr(", theta, ".b < ", theta, ".a)"))
+     )
+mtext("With varying theta.a prior inputs")
 
 # 4.2.c
 # Repeat the previous two questions, using posterior predictive distributions
@@ -121,6 +125,13 @@ for(i in 1:loop.n)
 }
 
 summary(output.vec)
+
+plot(output.vec
+     , main = "Pr(Y.b < Y.a)"
+     , xlab = "n.o values"
+     , ylab = "Pr(Y.b < Y.a)"
+)
+mtext("With varying theta.a prior inputs")
 
 # same kind of result as with 4.2.b - once the prior gets out of control 
 # your results shift pretty dramatically
@@ -163,27 +174,61 @@ no.bach.post <- rgamma(n = 5000, (a.no.bach + sum.no.bach), (b.no.bach + n.no.ba
 bach.pred <- rpois(5000, bach.post)
 no.bach.pred <- rpois(5000, no.bach.post)
 
+
+
 barplot(table(bach.pred))
 barplot(table(no.bach.pred))
 
+input <- as.matrix(rbind(table(bach.pred), table(no.bach.pred)))
+input[1,9] <- 0
+input
 
+barplot(input, beside = T
+        , main = "Monte Carlo Approx. for Post. Dist."
+        , xlab = "Number of Children"
+        , ylab = "Frequency"
+        , col = c("dodgerblue3", "darkolivegreen")
+        )
+
+legend(10, 1500
+       , c("Bach", "No Bach") 
+       , lty = c(1,1)
+#       , lwd = c(5,5)
+       , c("dodgerblue3", "darkolivegreen")
+)
 
 # 4.8.B
 # Find 95% quantile-based posterior confidence intervals for 
 # (theta.b - theta.a) and (Y.b - Y.a) 
 
 theta.diff <- (no.bach.post - bach.post)
-plot(density(theta.diff))
+plot(density(theta.diff)
+     , main = expression(paste("Difference between ", theta, ".b and ", theta, ".a"))
+     , xlab = expression(paste(theta, ".b - ", theta, ".a"))
+     , col = "darkorchid4"
+     , lwd = 2
+     )
 quantile(theta.diff, c(0.025, 0.975))
+summary(theta.diff)
 
 pred.diff <- (no.bach.pred - bach.pred)
-barplot(table(pred.diff))
+barplot(table(pred.diff)
+        , main = "Difference in Posterior Pred. Dists. Y.b - Y.a"
+        , xlab = "Difference"
+        , ylab = "Frequency"
+        , col = "darkorange4"
+        )
 quantile(pred.diff, c(0.025, 0.975))
-
+summary(pred.diff)
 
 # 4.8.C
 # The empirical distribution will just be the bar chart from above
-barplot(table(no.bach))
+barplot(table(no.bach)
+        , main = "Empirical Distribution for Group B"
+        , col = "darkred"
+        , xlab = "Number of Children"
+        , ylab = "Frequency"
+        )
 
 # Let's do some draws with theta.hat = 1.4
 
@@ -220,3 +265,5 @@ count.1.output[i] <- count.1
 plot(count.0.output, count.1.output)
 cor(count.0.output, count.1.output)
 
+mod <- lm(count.1.output ~ count.0.output)
+abline(mod)
