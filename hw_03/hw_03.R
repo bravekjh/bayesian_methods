@@ -235,7 +235,12 @@ barplot(table(no.bach)
 compare <- rpois(n = length(no.bach), 1.4)
 
 input <- as.matrix(rbind(table(no.bach), table(compare)))
-barplot(input, beside = T, col = c("dodgerblue3", "darkolivegreen"))
+
+barplot(input, beside = T, col = c("dodgerblue3", "darkolivegreen")
+        , main = "Group B Empirical vs. Theoretical Poisson"
+        , xlab = "Count of Children"
+        , ylab = "Frequency"
+        )
 
 legend(10, 75
        , c("Empirical", "Simulation") 
