@@ -272,8 +272,16 @@ count.0.output[i] <- count.0
 count.1.output[i] <- count.1
 }
 
-plot(count.0.output, count.1.output)
-cor(count.0.output, count.1.output)
+plot(count.0.output, count.1.output
+     , main = "Group B - Plot of 0 by 1"
+     , xlab = "Men with Zero Children"
+     , ylab = "Men with One Child"
+     )
+# cor(count.0.output, count.1.output)
 
-mod <- lm(count.1.output ~ count.0.output)
-abline(mod)
+# mod <- lm(count.1.output ~ count.0.output)
+# abline(mod)
+# summary(mod)
+table(no.bach)
+abline(v = 74, col = "dodgerblue")
+abline(h = 49, col = "darkred")
