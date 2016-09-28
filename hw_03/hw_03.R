@@ -230,6 +230,11 @@ barplot(table(no.bach)
         , ylab = "Frequency"
         )
 
+plot(ecdf(no.bach)
+     , main = "ECDF for Group B"
+     
+     )
+
 # Let's do some draws with theta.hat = 1.4
 
 compare <- rpois(n = length(no.bach), 1.4)
