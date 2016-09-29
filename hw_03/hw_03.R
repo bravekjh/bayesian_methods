@@ -1,5 +1,36 @@
 #homework 03 R script
 
+# Question 3.14.C
+
+theta <- seq(0,1,length = 100)
+sigma <- 1; n <- 10; y <- 4
+one <- exp( (-1/2) * (y - theta)^2 * (1/sigma))
+two <- theta^y
+three <- (1 - theta)^(n - y)
+
+final <- one * two * three
+
+plot(theta, final
+     , main = "Density of posterior for 3.14 Binary"
+     , xlab = expression(theta)
+     , ylab = "Posterior Density Estimate"
+     )
+
+# Question 3.14.C.D
+
+theta <- seq(0,1,length = 100)
+sigma <- 1; n <- 10; y <- 4
+one <- exp( (-1/2) * (y - theta)^2 * (1/sigma))
+two <- theta^y
+three <- exp(-theta)
+final <- one * two * three
+
+plot(theta, final
+     , main = "Density of posterior for 3.14 Poisson"
+     , xlab = expression(theta)
+     , ylab = "Posterior Density Estimate"     
+     )
+
 # Question 4.1
 # With a uniform (beta(1,1)) prior, County 1's posterior is beta(57, 43)
 
