@@ -57,6 +57,7 @@ s2n.3 <- ( (nu0 * s20) + ( (n.3 - 1) * s2.3 ) + ( (k0 / kn.3) * n.3 * (ybar.3 - 
 
 # School 1
 mun.1; s2n.1; sqrt(s2n.1)
+mun.1 - 
 # School 2
 mun.2; s2n.2; sqrt(s2n.2)
 # School 3
@@ -84,4 +85,75 @@ sqrt(s2n.2); quantile(sqrt(s2.sample.2), c(0.025, 0.975))
 mun.3; quantile(theta.sample.3, c(0.025, 0.975))
 sqrt(s2n.3); quantile(sqrt(s2.sample.3), c(0.025, 0.975))
 
+# 5.1.b
 
+df <- data.frame(cbind(theta.sample.1, theta.sample.2, theta.sample.3))
+head(df)
+
+
+# Permutation 1; 
+n = 1; i = 1; j = 2; k = 3
+
+df$perm.1 <- ifelse(
+  (df$theta.sample.1 < df$theta.sample.2)
+  &&
+    (df$theta.sample.2 < df$theta.sample.3)
+  , 1
+  , 0
+)
+table(df$perm.1)
+
+# Permutation 2; i = 1, j = 3, k = 2
+
+df$perm.2 <- ifelse(
+  (df$theta.sample.1 < df$theta.sample.3)
+  &&
+    (df$theta.sample.3 < df$theta.sample.2)
+  , 1
+  , 0
+)
+table(df$perm.2)
+
+# Permutation 3; i = 2, j = 1, k = 3
+
+df$perm.3 <- ifelse(
+  (df$theta.sample.2 < df$theta.sample.1)
+  &&
+    (df$theta.sample.1 < df$theta.sample.3)
+  , 1
+  , 0
+)
+table(df$perm.3)
+
+# Permutation 4; i = 2, j = 3, k = 1
+
+df$perm.4 <- ifelse(
+  (df$theta.sample.2 < df$theta.sample.3)
+  &&
+    (df$theta.sample.3 < df$theta.sample.1)
+  , 1
+  , 0
+)
+table(df$perm.4)
+
+# Permutation 5; i = 3, j = 1, k = 2
+
+df$perm.5 <- ifelse(
+  (df$theta.sample.3 < df$theta.sample.1)
+  &&
+    (df$theta.sample.1 < df$theta.sample.2)
+  , 1
+  , 0
+)
+table(df$perm.5)
+
+# Permutation 6; i = 3, j = 2, k = 1
+
+df$perm.6 <- ifelse(
+  (df$theta.sample.3 < df$theta.sample.2)
+  &&
+    (df$theta.sample.2 < df$theta.sample.1)
+  , 1
+  , 0
+)
+table(df$perm.6)
