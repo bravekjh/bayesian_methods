@@ -34,7 +34,7 @@ k0 <- 1; nu0 <- 2
 
 # extract vectors from the data frames
 y.1 <- school.1$time; y.2 <- school.2$time; y.3 <- school.3$time
-# extract vector length
+# extract vector length (number of obs)
 n.1 <- length(y.1); n.2 <- length(y.2); n.3 <- length(y.3)
 # extract sample means
 ybar.1 <- mean(y.1); ybar.2 <- mean(y.2); ybar.3 <- mean(y.3)
@@ -57,7 +57,6 @@ s2n.3 <- ( (nu0 * s20) + ( (n.3 - 1) * s2.3 ) + ( (k0 / kn.3) * n.3 * (ybar.3 - 
 
 # School 1
 mun.1; s2n.1; sqrt(s2n.1)
-mun.1 - 
 # School 2
 mun.2; s2n.2; sqrt(s2n.2)
 # School 3
@@ -87,73 +86,150 @@ sqrt(s2n.3); quantile(sqrt(s2.sample.3), c(0.025, 0.975))
 
 # 5.1.b
 
-df <- data.frame(cbind(theta.sample.1, theta.sample.2, theta.sample.3))
+df <- data.frame(cbind(theta.sample.1, theta.sample.2, theta.sample.3
+                       , s2.sample.1, s2.sample.2, s2.sample.3))
 head(df)
+dim(df)
+
+plot(density(df$theta.sample.1), main = "Theta Simulation Densities")
+lines(density(df$theta.sample.2), col="dodgerblue")
+lines(density(df$theta.sample.3), col="orange")
+legend(x = 12, y = 0.4
+       , c("one","two","three")
+       , lty = c(1,1)
+       , col=c("black", "dodgerblue", "orange")
+       )
+
+# Permutation 1; n = 1; i = 1; j = 2; k = 3
+
+mean( (df$theta.sample.1 < df$theta.sample.2) ) * mean(df$theta.sample.2 < df$theta.sample.3)
+
+# Permutation 2; n =2; i = 1; j = 3; k = 2
+
+mean( (df$theta.sample.1 < df$theta.sample.3) ) * mean(df$theta.sample.3 < df$theta.sample.2)
+
+# Permutation 3; n=3;i = 2; j = 1; k = 3
+
+mean( (df$theta.sample.2 < df$theta.sample.1) ) * mean(df$theta.sample.1 < df$theta.sample.3)
 
 
-# Permutation 1; 
-n = 1; i = 1; j = 2; k = 3
+# Permutation 4; n = 4;i = 2; j = 3; k = 1
 
-df$perm.1 <- ifelse(
-  (df$theta.sample.1 < df$theta.sample.2)
-  &&
-    (df$theta.sample.2 < df$theta.sample.3)
-  , 1
-  , 0
-)
-table(df$perm.1)
+mean( (df$theta.sample.2 < df$theta.sample.3) ) * mean(df$theta.sample.3 < df$theta.sample.1)
 
-# Permutation 2; i = 1, j = 3, k = 2
-
-df$perm.2 <- ifelse(
-  (df$theta.sample.1 < df$theta.sample.3)
-  &&
-    (df$theta.sample.3 < df$theta.sample.2)
-  , 1
-  , 0
-)
-table(df$perm.2)
-
-# Permutation 3; i = 2, j = 1, k = 3
-
-df$perm.3 <- ifelse(
-  (df$theta.sample.2 < df$theta.sample.1)
-  &&
-    (df$theta.sample.1 < df$theta.sample.3)
-  , 1
-  , 0
-)
-table(df$perm.3)
-
-# Permutation 4; i = 2, j = 3, k = 1
-
-df$perm.4 <- ifelse(
-  (df$theta.sample.2 < df$theta.sample.3)
-  &&
-    (df$theta.sample.3 < df$theta.sample.1)
-  , 1
-  , 0
-)
-table(df$perm.4)
 
 # Permutation 5; i = 3, j = 1, k = 2
 
-df$perm.5 <- ifelse(
-  (df$theta.sample.3 < df$theta.sample.1)
-  &&
-    (df$theta.sample.1 < df$theta.sample.2)
-  , 1
-  , 0
-)
-table(df$perm.5)
+mean( (df$theta.sample.3 < df$theta.sample.1) ) * mean(df$theta.sample.1 < df$theta.sample.2)
 
 # Permutation 6; i = 3, j = 2, k = 1
 
-df$perm.6 <- ifelse(
-  (df$theta.sample.3 < df$theta.sample.2)
-  &&
-    (df$theta.sample.2 < df$theta.sample.1)
-  , 1
-  , 0
-)
-table(df$perm.6)
+mean( (df$theta.sample.3 < df$theta.sample.2) ) * mean(df$theta.sample.2 < df$theta.sample.1)
+
+# 5.1.c
+# generate predictive draws from each of the schools distributions
+
+posterior.1 <- rnorm(n = 10000, mean = theta.sample.1, sd = sqrt(s2.sample.1))
+posterior.2 <- rnorm(n = 10000, mean = theta.sample.2, sd = sqrt(s2.sample.2))
+posterior.3 <- rnorm(n = 10000, mean = theta.sample.3, sd = sqrt(s2.sample.3))
+
+plot(density(posterior.1))
+lines(density(posterior.2), col = "dodgerblue")
+lines(density(posterior.3), col = "orange")
+
+# Permutation 1; n = 1; i = 1; j = 2; k = 3
+
+mean( (posterior.1 < posterior.2) ) * mean(posterior.2 < posterior.3)
+
+# Permutation 2; n =2; i = 1; j = 3; k = 2
+
+mean( (posterior.1 < posterior.3) ) * mean(posterior.3 < posterior.2)
+
+# Permutation 3; n=3;i = 2; j = 1; k = 3
+
+mean( (posterior.2 < posterior.1) ) * mean(posterior.1 < posterior.3)
+
+
+# Permutation 4; n = 4;i = 2; j = 3; k = 1
+
+mean( (posterior.2 < posterior.3) ) * mean(posterior.3 < posterior.1)
+
+
+# Permutation 5; i = 3, j = 1, k = 2
+
+mean( (posterior.3 < posterior.1) ) * mean(posterior.1 < posterior.2)
+
+# Permutation 6; i = 3, j = 2, k = 1
+
+mean( (posterior.3 < posterior.2) ) * mean(posterior.2 < posterior.1)
+
+# 5.1.d
+# Compute the posterior prob. that theta.1 is larger than both 
+# theta.2 and theta.3
+
+mean(df$theta.sample.1 > df$theta.sample.2) * mean(df$theta.sample.1 > df$theta.sample.3)
+mean(posterior.1 > posterior.2) * mean(posterior.1 > posterior.3)
+
+# 5.2
+
+n.a <- n.b <- 16
+
+ybar.a <- 75.2; s.a <- 7.3
+ybar.b <- 77.5; s.b <- 8.1
+
+# same prior for both populations
+mu0 <- 75; s20 <- 100
+
+priors <- data.frame(cbind( c(1,2,4,8,16,32), c(1,2,4,8,16,32) ))
+names(priors) <- c("k0", "nu0")
+
+
+# loop starts here
+inputter <- rep(0,6)
+ns <- c(1,2,4,8,16,32)
+par(mfrow=c(2,3))
+for(i in seq_along(ns)) 
+{
+
+kn <- n.a + priors$k0[i]
+nun <- n.a + priors$nu0[i]
+
+mun.a.i <- ( (priors$k0[i] * mu0) + (n.a * ybar.a) ) / kn
+s2n.a.i <- ( (priors$nu0[i] * s20) + ( (n.a - 1) * s.a ) + ( (priors$k0[i] / kn) * n.a * (ybar.a - mu0)^2 )  ) / nun
+
+mun.b.i <- ( (priors$k0[i] * mu0) + (n.b * ybar.b) ) / kn
+s2n.b.i <- ( (priors$nu0[i] * s20) + ( (n.b - 1) * s.b ) + ( (priors$k0[i] / kn) * n.b * (ybar.b - mu0)^2 )  ) / nun
+
+
+# posterior samples
+
+# pop A first
+s2.a.postsample <- 1 / rgamma(10000, nun / 2, s2n.a.i * nun / 2)
+theta.a.postsample <- rnorm(10000, mun.a.i, sqrt(s2.a.postsample / kn))
+# pop B second
+s2.b.postsample <- 1 / rgamma(10000, nun / 2, s2n.b.i * nun / 2)
+theta.b.postsample <- rnorm(10000, mun.b.i, sqrt(s2.b.postsample / kn))
+
+# probabilities
+
+plot(density(theta.a.postsample), main = paste("Graphic", i))
+lines(density(theta.b.postsample), col = "dodgerblue")
+
+inputter[i] <- mean(theta.a.postsample < theta.b.postsample)
+
+}
+
+inputter
+
+par(mfrow=c(1,1))
+
+plot(ns, inputter
+     , type = "b"
+     , lwd = 2
+     , col = "dodgerblue"
+     , main = expression(paste(nu, "0 vs. Pr(", theta, ".a < ", theta, ".b)"))
+     , xlab = expression(paste(nu))
+     , ylab = expression(paste("Pr(", theta, ".a < ", theta, ".b)"))
+     )
+
+
