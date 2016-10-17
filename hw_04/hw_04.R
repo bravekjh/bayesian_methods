@@ -133,9 +133,15 @@ posterior.1 <- rnorm(n = 10000, mean = theta.sample.1, sd = sqrt(s2.sample.1))
 posterior.2 <- rnorm(n = 10000, mean = theta.sample.2, sd = sqrt(s2.sample.2))
 posterior.3 <- rnorm(n = 10000, mean = theta.sample.3, sd = sqrt(s2.sample.3))
 
-plot(density(posterior.1))
+plot(density(posterior.1), main = "Posterior Predictive Distributions")
 lines(density(posterior.2), col = "dodgerblue")
 lines(density(posterior.3), col = "orange")
+
+legend(x = 18, y = 0.08
+       , c("one","two","three")
+       , lty = c(1,1)
+       , col=c("black", "dodgerblue", "orange")
+)
 
 # Permutation 1; n = 1; i = 1; j = 2; k = 3
 
