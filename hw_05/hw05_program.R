@@ -17,44 +17,59 @@ no.bach <- scan(
   
 )
 
+### ID the starting parameters
+## Likelihood parameters first
+y <- bach
+y.bar <- mean(bach)
+n <- length(bach)
 
-# let's let pop A be the bachelor pop, and B be the no bachelor pop
+z <- no.bach
+z.bar <- mean(no.bach)
+m <- length(z)
 
-y <- c(bach, no.bach)
+## now the mcmc parameters
 
-# starting values
+S <- 5000 # number of Gibbs Samples
+PHI <- matrix(nrow=S, ncol = 2)
+PHI[1,] <- c(1,1) # gotta start somewhere
+diff.matrix <- matrix(nrow=S, ncol = 1) #matrix for the differences
+diff.matrix[1,] <- 1 # gotta start somewhere
 
-S<- 1000
-PHI <- matrix(nrow=S, ncol=2)
-PHI[1,] <- phi <- c(1, 1)
-diff.matrix <- matrix(nrow=S, ncol=1)
-diff.matrix[1,] <- 1
+theta.a <- 2; theta.b <- 1
+lambda.a <- lambda.b <- 8
 
-set.seed(1738)
-for(s in 2:S){
+## now, lets enter the loop
+
+lambda.sequence <- c(8, 16, 32, 64, 128)
+
+for(i in seq_along(lambda.sequence))
+{
+  lambda <- i
+  set.seed(1738)
+  for(s in 2:S)
+    {
+    
+    PHI.i <- matrix(nrow = S, ncol = 2)
+    PHI.i[1,] <- c(1,1)
+    diff.matrix.i <- matrix(nrow = S, ncol = 1)
+    diff.matrix.i[1,] <- 1
+    
+    # first take a draw for the theta value
+    theta <- rgamma(1, (n*y.bar)+(m*z.bar)+theta.a, n + (m*PHI.i[s-1,2]) + theta.b  )
+    
+    # now take a draw for the lambda value
+    lambda <- rgamma(1, (m*z.bar) - lambda, (m*PHI.i[s-1,1]) + lambda)
+    
+    phi <- c(theta, lambda)
+    PHI.i[s,] <- phi
+    
+    diff.element <- lambda - theta
+    diff.matrix.i[s] <- diff.element
+    }
   
-# draw a sample value of lambda
+#  plot(density(PHI[,1]), col = "red")
+#  lines(density(PHI[,2]), col = "blue")
+#  plot(density(diff.matrix), col = "black")
 
-lambda <- rgamma(1,sum(y) + 8, 8 + phi[2])
-
-# draw a sample value of theta
-
-theta <- ( rgamma(1, sum(y) + 2, phi[1] + 1*sum(y) + 8*sum(y) ) * lambda)
-
-phi <- c(theta, lambda)
-
-PHI[s,] <- phi
-
-theta.a <- theta
-theta.b <- theta*lambda
-diff <- theta.b - theta.a
-diff.matrix[s] <- diff
 }
 
-plot(density(PHI[,1]))
-plot(density(PHI[,2]))
-
-plot(density(diff.matrix[,1]))
-
-plot(PHI[,1])
-plot(PHI[,2])
