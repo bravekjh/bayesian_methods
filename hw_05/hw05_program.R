@@ -42,34 +42,34 @@ lambda.a <- lambda.b <- 8
 
 lambda.sequence <- c(8, 16, 32, 64, 128)
 
-for(i in seq_along(lambda.sequence))
-{
-  lambda <- i
-  set.seed(1738)
+lambda.a <- lambda.b <- 128
+  set.seed(1840)
   for(s in 2:S)
     {
-    
-    PHI.i <- matrix(nrow = S, ncol = 2)
-    PHI.i[1,] <- c(1,1)
-    diff.matrix.i <- matrix(nrow = S, ncol = 1)
-    diff.matrix.i[1,] <- 1
-    
+        
     # first take a draw for the theta value
-    theta <- rgamma(1, (n*y.bar)+(m*z.bar)+theta.a, n + (m*PHI.i[s-1,2]) + theta.b  )
+    theta <- rgamma(1, (n*y.bar)+(m*z.bar)+theta.a, n + (m*PHI[s-1,2]) + theta.b  )
     
     # now take a draw for the lambda value
-    lambda <- rgamma(1, (m*z.bar) - lambda, (m*PHI.i[s-1,1]) + lambda)
+    lambda <- rgamma(1, (m*z.bar) - lambda.a, (m*PHI[s-1,1]) + lambda.b)
     
     phi <- c(theta, lambda)
-    PHI.i[s,] <- phi
+    PHI[s,] <- phi
     
     diff.element <- lambda - theta
-    diff.matrix.i[s] <- diff.element
+    diff.matrix[s] <- diff.element
     }
   
-#  plot(density(PHI[,1]), col = "red")
-#  lines(density(PHI[,2]), col = "blue")
-#  plot(density(diff.matrix), col = "black")
+  plot(density(PHI[,1]), col = "red")
+  lines(density(PHI[,2]), col = "blue")
+  plot(density(diff.matrix))
 
-}
+pdf("C:/Users/Philip/Schools/TAMU/STAT_638/Homework_Assignments/HW_05/hw_output/lambda128.pdf")
+plot(
+  density(diff.matrix)
+    , col = "black"
+    , main = "Density of theta.b - theta.a"
+  )
+mtext(paste("Labmda =", 128, "  Mean =", round(mean(diff.matrix), digits = 3)  ))
+dev.off()
 
