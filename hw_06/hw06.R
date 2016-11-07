@@ -174,12 +174,31 @@ legend(5.5, .2, c("Theta.1", "Theta.2"), lwd =c(2,2), lty=c(1,2) )
 # we are going to need to extract the correlation coefficient from each of the 
 # covariance matrices.  
 
-COEF <- NULL
+#blue crabs first
+COEF.BLUE <- NULL
 
-for(j in 1:nrow(SIGMA))
+for(j in 1:nrow(SIGMA.BLUE))
   {
-  corr.coef <- SIGMA[j, 2] / sqrt( SIGMA[j, 1] * SIGMA[j, 4]  )
-  COEF <- rbind(COEF, corr.coef)
+  corr.coef <- SIGMA.BLUE[j, 2] / sqrt( SIGMA.BLUE[j, 1] * SIGMA.BLUE[j, 4]  )
+  COEF.BLUE <- rbind(COEF.BLUE, corr.coef)
   }
 
-plot(density(COEF))
+
+
+#orange crabs first
+COEF.ORANGE <- NULL
+
+for(j in 1:nrow(SIGMA.ORANGE))
+{
+  corr.coef <- SIGMA.ORANGE[j, 2] / sqrt( SIGMA.ORANGE[j, 1] * SIGMA.ORANGE[j, 4]  )
+  COEF.ORANGE <- rbind(COEF.ORANGE, corr.coef)
+}
+
+plot(density(COEF.BLUE)
+     , main="Posterior Densities for rho.blue and rho.orange"
+     , lwd = 2
+     )
+lines(density(COEF.ORANGE), lty=2, lwd = 2)
+legend(0.9, 30, c("Blue", "Orange"), lty=c(1,2), lwd=c(2,2))
+
+mean(COEF.BLUE < COEF.ORANGE)
