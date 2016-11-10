@@ -220,8 +220,43 @@ mean(COEF.BLUE < COEF.ORANGE)
 #mean +/- 1.96(sd).  Compare the intervals you get using the two 
 #different methods.
 
+# read in the data
+
 bldwrk <- read.table("C:/Users/Philip/Schools/TAMU/STAT_638/Homework_Assignments/HW_06/bloodwork.txt")
-head(bldwrk, n = 5)
+head(bldwrk)
+# function below expects a matrix, so let's give it one
+bldwork <- as.matrix(bldwrk)
+class(bldwork)
+
+# let's generate our inital parameters
+mu0 <- apply(X = bldwork, MARGIN = 2, FUN = mean) # mean
+L0 <- cov(bldwork) # initial sigma
+
+# let's get an initial KDE for the data
+par(mfrow=c(2,2))
+plot(density(bldwork[,1]), main = "V1")
+plot(density(bldwork[,2]), main = "V2")
+plot(density(bldwork[,3]), main = "V3")
+
+# functions for generating random draws from the mvnorm and wishart distro's
+rjmvnorm=function(n,mu,Sigma){
+  p=length(mu)
+  X=matrix(rnorm(p*n),p,n)
+  Sigroot=t(chol(Sigma))
+  X=Sigroot %*% X + mu
+  t(X)
+}
+
+rjWishart=function(n,nu,M){
+  p=nrow(M)
+  out=array(0,c(p,p,n))
+  for(j in 1:n){
+    Z=rjmvnorm(nu,rep(0,len=p),M)
+    out[1:p,1:p,j]=t(Z)%*%Z
+  }
+  out
+}
+
 
 missing=function(Y,theta,Sigma,nreps){
   #
@@ -268,6 +303,7 @@ missing=function(Y,theta,Sigma,nreps){
     #  Compute the sample mean vector using the n x 3 "data" matrix that
     #  includes the two most recently generated pseudo observations.
     #
+    
     ybar=matrix(1,1,n)%*%Y/n
     #
     #   Generate theta given Y, Sigma and Ymiss, where Ymiss is a 2-vector
@@ -313,24 +349,82 @@ missing=function(Y,theta,Sigma,nreps){
   #
   # The three components of the output are put in a list.
   #  
-  list(output,Theta,Sigma.out)
+  #list(output,Theta,Sigma.out)
 }
 
-rjmvnorm=function(n,mu,Sigma){
-  p=length(mu)
-  X=matrix(rnorm(p*n),p,n)
-  Sigroot=t(chol(Sigma))
-  X=Sigroot %*% X + mu
-  t(X)
-}
 
-rjWishart=function(n,nu,M){
-  p=nrow(M)
-  out=array(0,c(p,p,n))
-  for(j in 1:n){
-    Z=rjmvnorm(nu,rep(0,len=p),M)
-    out[1:p,1:p,j]=t(Z)%*%Z
-  }
-  out
-}
+# First, let's create some plots
+par(mfrow=c(3,2))
+
+plot(Theta[,1], Theta[,2]
+     , main = expression(paste(theta, "1 vs. ", theta, "2"))
+     , xlab = expression(paste(theta, "1"))
+     , ylab = expression(paste(theta, "2"))
+     )
+
+plot(Theta[,1], Theta[,3]
+     , main = expression(paste(theta, "1 vs. ", theta, "3"))
+     , xlab = expression(paste(theta, "1"))
+     , ylab = expression(paste(theta, "3"))
+)
+
+plot(Theta[,2], Theta[,3]
+     , main = expression(paste(theta, "2 vs. ", theta, "3"))
+     , xlab = expression(paste(theta, "2"))
+     , ylab = expression(paste(theta, "3"))
+)
+
+plot(density(Theta[,1])
+     , main = expression(paste("Kernel estimate ", theta, "1"))
+     , xlab = expression(paste(theta, "1"))
+     )
+
+plot(density(Theta[,2])
+     , main = expression(paste("Kernel estimate ", theta, "2"))
+     , xlab = expression(paste(theta, "2"))
+)
+
+plot(density(Theta[,3])
+     , main = expression(paste("Kernel estimate ", theta, "3"))
+     , xlab = expression(paste(theta, "3"))
+)
+
+par(mfrow=c(3,2))
+
+plot(Sigma.out[1, 1 , 1:n], Sigma.out[2, 2 , 1:n]
+     , main = expression(paste(sigma,"1 vs. ", sigma, "2"))
+     , xlab = expression(paste(sigma, "1"))
+     , ylab = expression(paste(sigma, "2"))
+     )
+
+plot(Sigma.out[1, 1 , 1:n], Sigma.out[3, 3 , 1:n]
+     , main = expression(paste(sigma,"1 vs. ", sigma, "3"))
+     , xlab = expression(paste(sigma, "1"))
+     , ylab = expression(paste(sigma, "3"))
+)
+
+plot(Sigma.out[2, 2 , 1:n], Sigma.out[3, 3 , 1:n]
+     , main = expression(paste(sigma,"2 vs. ", sigma, "3"))
+     , xlab = expression(paste(sigma, "2"))
+     , ylab = expression(paste(sigma, "3"))
+)
+
+plot(density(Sigma.out[1, 1 , 1:n])
+     , main = expression(paste("Kernel Estimate ", sigma, "1"))
+     , xlab = expression(paste(sigma, "1"))
+     )
+
+plot(density(Sigma.out[2, 2 , 1:n])
+     , main = expression(paste("Kernel Estimate ", sigma, "2"))
+     , xlab = expression(paste(sigma, "2"))
+     )
+
+plot(density(Sigma.out[3, 3 , 1:n])
+     , main = expression(paste("Kernel Estimate ", sigma, "3"))
+     , xlab = expression(paste(sigma, "3"))
+     )
+
+# now generate the correlations
+
+# now generate the confidence intervals
 
