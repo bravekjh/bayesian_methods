@@ -426,5 +426,77 @@ plot(density(Sigma.out[3, 3 , 1:n])
 
 # now generate the correlations
 
+
+plot(density(Sigma.out[1,2,1:n])
+     , main = expression(paste("Density of " ,rho, "1,2"))
+     , xlab = expression(paste(rho, "1,2"))
+     )
+
+plot(density(Sigma.out[1,3,1:n])
+     , main = expression(paste("Density of " ,rho, "1,3"))
+     , xlab = expression(paste(rho, "1,3"))     
+     )
+
+plot(density(Sigma.out[2,3,1:n])
+     , main = expression(paste("Density of " ,rho, "2,3"))
+     , xlab = expression(paste(rho, "2,3"))          
+     )
+
+
 # now generate the confidence intervals
 
+# Theta 1
+quantile(Theta[,1], c(0.025, 0.975))
+c(mean(Theta[,1]) - 1.96*sd(Theta[,1])
+    ,mean(Theta[,1] + 1.96*sd(Theta[,1]))  )
+
+# Theta 2
+quantile(Theta[,2], c(0.025, 0.975))
+c(mean(Theta[,2]) - 1.96*sd(Theta[,2])
+  ,mean(Theta[,2] + 1.96*sd(Theta[,2]))  )
+
+# Theta 3
+quantile(Theta[,3], c(0.025, 0.975))
+c(mean(Theta[,3]) - 1.96*sd(Theta[,3])
+  ,mean(Theta[,3] + 1.96*sd(Theta[,3]))  )
+
+# Sigma 1
+quantile(Sigma.out[1, 1 , 1:n], c(0.025, 0.975))
+c( mean(Sigma.out[1, 1 , 1:n]) - 1.96*sd(Sigma.out[1, 1 , 1:n])
+  , mean(Sigma.out[1, 1 , 1:n]) + 1.96*sd(Sigma.out[1, 1 , 1:n])
+  )
+
+# Sigma 2
+quantile(Sigma.out[2, 2 , 1:n], c(0.025, 0.975))
+c( mean(Sigma.out[2, 2 , 1:n]) - 1.96*sd(Sigma.out[2, 2 , 1:n])
+   , mean(Sigma.out[2, 2 , 1:n]) + 1.96*sd(Sigma.out[2, 2 , 1:n])
+)
+
+# Sigma 3
+quantile(Sigma.out[3, 3 , 1:n], c(0.025, 0.975))
+c( mean(Sigma.out[3, 3 , 1:n]) - 1.96*sd(Sigma.out[3, 3 , 1:n])
+   , mean(Sigma.out[3, 3 , 1:n]) + 1.96*sd(Sigma.out[3, 3 , 1:n])
+)
+
+
+# rho(1,2)
+
+quantile(Sigma.out[1, 2 , 1:n], c(0.025, 0.975))
+c( mean(Sigma.out[1, 2 , 1:n]) - 1.96*sd(Sigma.out[1, 2 , 1:n])
+   , mean(Sigma.out[1, 2 , 1:n]) + 1.96*sd(Sigma.out[1, 2 , 1:n])
+)
+
+
+# rho(1,3)
+
+quantile(Sigma.out[1, 3 , 1:n], c(0.025, 0.975))
+c( mean(Sigma.out[1, 3 , 1:n]) - 1.96*sd(Sigma.out[1, 3 , 1:n])
+   , mean(Sigma.out[1, 3 , 1:n]) + 1.96*sd(Sigma.out[1, 3 , 1:n])
+)
+
+# rho(2,3)
+
+quantile(Sigma.out[2, 3 , 1:n], c(0.025, 0.975))
+c( mean(Sigma.out[2, 3 , 1:n]) - 1.96*sd(Sigma.out[2, 3 , 1:n])
+   , mean(Sigma.out[2, 3 , 1:n]) + 1.96*sd(Sigma.out[2, 3 , 1:n])
+)
