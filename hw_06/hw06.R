@@ -426,22 +426,25 @@ plot(density(Sigma.out[3, 3 , 1:n])
 
 # now generate the correlations
 
+par(mfrow=c(1,1))
 
 plot(density(Sigma.out[1,2,1:n])
      , main = expression(paste("Density of " ,rho, "1,2"))
      , xlab = expression(paste(rho, "1,2"))
      )
+abline(v = 0)
 
 plot(density(Sigma.out[1,3,1:n])
      , main = expression(paste("Density of " ,rho, "1,3"))
      , xlab = expression(paste(rho, "1,3"))     
      )
+abline(v = 0)
 
 plot(density(Sigma.out[2,3,1:n])
      , main = expression(paste("Density of " ,rho, "2,3"))
      , xlab = expression(paste(rho, "2,3"))          
      )
-
+abline(v = 0)
 
 # now generate the confidence intervals
 
