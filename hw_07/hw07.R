@@ -85,7 +85,7 @@ normal.hierarchy.suff=function(Y,nreps,mu0,gamma0,eta0,tau0,nu0,sigma0){
 
 # call the function
 school.output <- normal.hierarchy.suff(school.input
-                      , nreps = 2000
+                      , nreps = 2500
                       , mu0 = mu.0
                       , gamma0 = gamma.0
                       , eta0 = eta.0
@@ -108,27 +108,30 @@ school.output <- normal.hierarchy.suff(school.input
 ## First let's plot the output of each parameter chain for each School 
 
 # theta
-par(mfrow=c(2,4))
-plot(school.output[[1]][,1])
-plot(school.output[[1]][,2])
-plot(school.output[[1]][,3])
-plot(school.output[[1]][,4])
-plot(school.output[[1]][,5])
-plot(school.output[[1]][,6])
-plot(school.output[[1]][,7])
-plot(school.output[[1]][,8])
+pdf("C:/Users/Philip/Schools/TAMU/STAT_638/Homework_Assignments/HW_07/mcmc_convergence.pdf")
+par(mfrow=c(2,2))
+plot(school.output[[1]][,1], main = expression(paste(theta, " MCMC School 1")), cex = .75)
+plot(school.output[[1]][,2], main = expression(paste(theta, " MCMC School 2")), cex = .75)
+plot(school.output[[1]][,3], main = expression(paste(theta, " MCMC School 3")), cex = .75)
+plot(school.output[[1]][,4], main = expression(paste(theta, " MCMC School 4")), cex = .75)
+plot(school.output[[1]][,5], main = expression(paste(theta, " MCMC School 5")), cex = .75)
+plot(school.output[[1]][,6], main = expression(paste(theta, " MCMC School 6")), cex = .75)
+plot(school.output[[1]][,7], main = expression(paste(theta, " MCMC School 7")), cex = .75)
+plot(school.output[[1]][,8], main = expression(paste(theta, " MCMC School 8")), cex = .75)
 
 # sigma2
 par(mfrow=c(1,1))
-plot(school.output[[2]])
+plot(school.output[[2]], main = expression(paste(sigma, " squared MCMC")), cex = .75)
 
 # mu
 par(mfrow=c(1,1))
-plot(school.output[[3]])
+plot(school.output[[3]], main = expression(paste(mu, " MCMC")), cex = .75)
 
 # tau2
 par(mfrow=c(1,1))
-plot(school.output[[4]])
+plot(school.output[[4]], main = expression(paste(tau, " squared MCMC")), cex = .75)
+
+dev.off()
 
 ## Using the ess function from the mcmcse package
 
@@ -140,14 +143,18 @@ ess(x = as.matrix((school.output[[4]])))
 # 8.3.b)
 # Compute posterior means and 95% conf. regions for sigma2, mu, tau2
 
+pdf("C:/Users/Philip/Schools/TAMU/STAT_638/Homework_Assignments/HW_07/posterior_densities.pdf")
 # sigma2
+par(mfrow=c(1,1))
 avg <- mean(school.output[[2]])
 one <- mean(school.output[[2]]) - 1.96*sqrt(var(school.output[[2]]))/sqrt(length(school.output[[2]]))
 two <- mean(school.output[[2]]) + 1.96*sqrt(var(school.output[[2]]))/sqrt(length(school.output[[2]]))
 # display
 c(one, avg, two)
-plot(density(school.output[[2]]))
+plot(density(school.output[[2]])
+    , main=expression(paste(sigma, "2 density")))
 abline(v = avg, col="blue")
+abline(v = sigma.0.sq)
 
 # mu
 avg <- mean(school.output[[3]])
@@ -155,8 +162,10 @@ one <- mean(school.output[[3]]) - 1.96*sqrt(var(school.output[[3]]))/sqrt(length
 two <- mean(school.output[[3]]) + 1.96*sqrt(var(school.output[[3]]))/sqrt(length(school.output[[3]]))
 # display
 c(one, avg, two)
-plot(density(school.output[[3]]))
+plot(density(school.output[[3]])
+     , main=expression(paste(mu, " density")))
 abline(v = avg, col="blue")
+abline(v = mu.0, col = "black")
 
 # tau2
 avg <- mean(school.output[[4]])
@@ -164,14 +173,14 @@ one <- mean(school.output[[4]]) - 1.96*sqrt(var(school.output[[4]]))/sqrt(length
 two <- mean(school.output[[4]]) + 1.96*sqrt(var(school.output[[4]]))/sqrt(length(school.output[[4]]))
 # display
 c(one, avg, two)
-plot(density(school.output[[4]]))
+plot(density(school.output[[4]])
+     , main=expression(paste(tau, "2 density")))
 abline(v = avg, col="blue")
+abline(v = tau.0.sq, col = "black")
 
+dev.off()
 
 # 8.3.c
-
-
-
 
 tau.2.post <- school.output[[4]]
 sigma.2.post <- school.output[[2]]
@@ -179,11 +188,23 @@ sigma.2.post <- school.output[[2]]
 big.r.post <- tau.2.post / (sigma.2.post + tau.2.post)
 
 
+mu.0 <- 7; gamma.0 <- 5; tau.0.sq <- 10; eta.0 <- 2; sigma.0.sq <- 15; nu.0 <- 2
+
+big.r.pre <- tau.0.sq / (sigma.0.sq + tau.0.sq)
+
+par(mfrow=c(1,1))
+plot(density(big.r.post)
+     , main = "Posterior density of R")
+abline(v = big.r.pre)
+mtext("Prior R = 0.4")
 # 8.4.d
 ## obtain the postioer probability that theta.7 < theta.6
 
 mean(school.output[[1]][,6] > school.output[[1]][,7])
-plot(density(school.output[[1]][,6]))
+plot(density(school.output[[1]][,6])
+     , main = "School 6 vs. School 7"
+     )
+mtext("School 6 line = Continuous, 7 = dashed")
 lines(density(school.output[[1]][,7]), lty = 2)
 
 prob <- (
@@ -206,42 +227,42 @@ prob
 par(mfrow=c(2,4))
 
 # School 1
-plot(density(school.output[[1]][,1]))
+plot(density(school.output[[1]][,1]), main = "School 1")
 lines(density(list_of_data[[1]]$V1))
 c(mean(list_of_data[[1]]$V1),mean(school.output[[1]][,1]))
 
 # School 2
-plot(density(school.output[[1]][,2]))
+plot(density(school.output[[1]][,2]), main = "School 2")
 lines(density(list_of_data[[2]]$V1))
 c(mean(list_of_data[[2]]$V1),mean(school.output[[1]][,2]))
 
 # School 3
-plot(density(school.output[[1]][,3]))
+plot(density(school.output[[1]][,3]), main = "School 3")
 lines(density(list_of_data[[3]]$V1))
 c(mean(list_of_data[[3]]$V1),mean(school.output[[1]][,3]))
 
 # School 4
-plot(density(school.output[[1]][,4]))
+plot(density(school.output[[1]][,4]) , main = "School 4")
 lines(density(list_of_data[[4]]$V1))
 c(mean(list_of_data[[4]]$V1),mean(school.output[[1]][,4]))
 
 # School 5
-plot(density(school.output[[1]][,5]))
+plot(density(school.output[[1]][,5]), main = "School 5")
 lines(density(list_of_data[[5]]$V1))
 c(mean(list_of_data[[5]]$V1),mean(school.output[[1]][,5]))
 
 # School 6
-plot(density(school.output[[1]][,6]))
+plot(density(school.output[[1]][,6]), main = "School 6")
 lines(density(list_of_data[[6]]$V1))
 c(mean(list_of_data[[6]]$V1),mean(school.output[[1]][,6]))
 
 # School 7
-plot(density(school.output[[1]][,7]))
+plot(density(school.output[[1]][,7]), main = "School 7")
 lines(density(list_of_data[[7]]$V1))
 c(mean(list_of_data[[7]]$V1),mean(school.output[[1]][,7]))
 
 # School 8
-plot(density(school.output[[1]][,8]))
+plot(density(school.output[[1]][,8]), main = "School 8")
 lines(density(list_of_data[[8]]$V1))
 c(mean(list_of_data[[8]]$V1),mean(school.output[[1]][,8]))
 
