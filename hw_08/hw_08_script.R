@@ -18,6 +18,123 @@ summary(diabetes$glu)
 boxplot(diabetes$glu)
 qplot(glu, data = diabetes, geom = "density", kernel = "gaussian")
 
+# now, let's actually go through the modeling process
+
+y <- diabetes$glu
+pre_X <- select(diabetes, -glu, -diabetes) %>%
+  data.matrix()
+
+int <- rep(1, nrow(pre_X))
+
+X <- cbind(int, pre_X)
+
+g <- length(y)
+nu0 <- 2
+s20 <- 1
+S <- 1000
+n <- dim(X)[1]
+p <- dim(X)[2]
+
+Hg <- (g/(g+1)) * X %*% solve(t(X)%*%X) %*% t(X)
+SSRg <- t(y) %*% (diag(1, nrow=n) - Hg) %*% y
+
+s2 <- 1 / rgamma(S, (nu0 + n)/2, (nu0*s20+SSRg)/2 )
+
+Vb <- g * solve(t(X) %*% X) / (g + 1)
+Eb <- Vb %*% t(X) %*% y
+
+E <- matrix(rnorm(S * p, 0, sqrt(s2)), S, p )
+beta <- t(  t(E%*%chol(Vb)) + c(Eb) )
+
+head(beta)
+
+beta_df <- beta %>%
+  data.frame()
+
+# Intercept
+
+qplot(int, data = beta_df, geom = "density"
+      , main = "Intercept Density")
+
+(beta_df$int %>%
+  mean() ) - (1.96 * sd(beta_df$int))
+
+(beta_df$int %>%
+   mean() ) + (1.96 * sd(beta_df$int))
+
+# NPREG
+
+qplot(npreg, data = beta_df, geom = "density"
+      , main = "NPREG Density")
+
+(beta_df$npreg %>%
+   mean() ) - (1.96 * sd(beta_df$npreg))
+
+(beta_df$npreg %>%
+   mean() ) + (1.96 * sd(beta_df$npreg))
+
+# BP
+
+qplot(bp, data = beta_df, geom = "density"
+      , main = "BP Density")
+
+(beta_df$bp %>%
+   mean() ) - (1.96 * sd(beta_df$bp))
+
+(beta_df$bp %>%
+   mean() ) + (1.96 * sd(beta_df$bp))
+
+# Skin
+
+qplot(skin, data = beta_df, geom = "density"
+      , main = "Skin Density")
+
+(beta_df$skin %>%
+   mean() ) - (1.96 * sd(beta_df$skin))
+
+(beta_df$skin %>%
+   mean() ) + (1.96 * sd(beta_df$skin))
+
+# BMI
+
+qplot(bmi, data = beta_df, geom = "density"
+      , main = "BMI Density")
+
+(beta_df$bmi %>%
+   mean() ) - (1.96 * sd(beta_df$bmi))
+
+(beta_df$bmi %>%
+   mean() ) + (1.96 * sd(beta_df$bmi))
+
+# PED
+
+qplot(ped, data = beta_df, geom = "density"
+      , main = "PED Density")
+
+(beta_df$ped %>%
+   mean() ) - (1.96 * sd(beta_df$ped))
+
+(beta_df$ped %>%
+   mean() ) + (1.96 * sd(beta_df$ped))
+
+# Age
+
+qplot(age, data = beta_df, geom = "density"
+      , main = "age Density")
+
+(beta_df$age %>%
+   mean() ) - (1.96 * sd(beta_df$age))
+
+(beta_df$age %>%
+   mean() ) + (1.96 * sd(beta_df$age))
+
+
+# 
+
+
+
+
+
 
 # Let's define a few functions for modeling
 
@@ -149,5 +266,25 @@ modelselect=function(X,y,nreps,z){
   list(Beta,Z,Sigma2)
 }
 
-#
+### For the impending regression,
+# set up the design matrix, response vector, nreps, and 
 
+design_m <- select(diabetes, -glu) %>%
+  data.matrix
+
+head(design_m)
+
+response_vec <- select(diabetes, glu) %>%
+  as.vector
+
+mod_select <- c(1,1,1,1,1,1,0)
+
+dim(design_m)
+dim(response_vec)
+length(mod_select)
+
+mod_out <- modelselect(X = design_m
+                       , y = response_vec
+                       , nreps = 1000
+                       , z = mod_select
+                         )
