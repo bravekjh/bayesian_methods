@@ -2,8 +2,49 @@
 
 # R script for Homework 08
 
+# import some useful libraries
 library("ggplot2")
 library("dplyr")
+library("MASS")
+library("stargazer")
+
+# define some useful functions
+make_matrix <- function(dset, place)
+{
+  ### This function will create the design matrix for regression
+  #      pre_X <- dplyr::select(dset, -eval(response_var)) %>%
+  #       data.matrix()
+
+  pre_X <- dset[,-place] # place is the variable index 
+  int <- rep(1, nrow(pre_X))
+  X <- cbind(int, pre_X) %>%
+    data.matrix()
+  return(X)
+}
+
+bayes_regress <- function(response_vec, design_matrix, nu0_val, s20_val, nreps)
+{
+  ### This function will run a bayesian linear regression
+  g <- length(response_vec)
+  nu0 <- nu0_val
+  s20 <- s20_val
+  S <- nreps
+  n <- dim(design_matrix)[1]
+  p <- dim(design_matrix)[2]
+  
+  
+  Hg <- (g/(g+1)) * design_matrix %*% solve(t(design_matrix)%*%design_matrix) %*% t(design_matrix)
+  SSRg <- t(response_vec) %*% (diag(1, nrow=n) - Hg) %*% response_vec
+  
+  s2 <- 1 / rgamma(S, (nu0 + n)/2, (nu0*s20+SSRg)/2 )
+  
+  Vb <- g * solve(t(design_matrix) %*% design_matrix) / (g + 1)
+  Eb <- Vb %*% t(design_matrix) %*% response_vec
+  
+  E <- matrix(rnorm(S * p, 0, sqrt(s2)), S, p )
+  beta <- t(  t(E%*%chol(Vb)) + c(Eb) )
+  return(beta)
+}
 
 # 9.2
 
@@ -21,115 +62,337 @@ qplot(glu, data = diabetes, geom = "density", kernel = "gaussian")
 # now, let's actually go through the modeling process
 
 y <- diabetes$glu
-pre_X <- select(diabetes, -glu, -diabetes) %>%
-  data.matrix()
 
-int <- rep(1, nrow(pre_X))
+X <- make_matrix(dset = diabetes, c(2,8))
 
-X <- cbind(int, pre_X)
-
-g <- length(y)
-nu0 <- 2
-s20 <- 1
-S <- 1000
-n <- dim(X)[1]
-p <- dim(X)[2]
-
-Hg <- (g/(g+1)) * X %*% solve(t(X)%*%X) %*% t(X)
-SSRg <- t(y) %*% (diag(1, nrow=n) - Hg) %*% y
-
-s2 <- 1 / rgamma(S, (nu0 + n)/2, (nu0*s20+SSRg)/2 )
-
-Vb <- g * solve(t(X) %*% X) / (g + 1)
-Eb <- Vb %*% t(X) %*% y
-
-E <- matrix(rnorm(S * p, 0, sqrt(s2)), S, p )
-beta <- t(  t(E%*%chol(Vb)) + c(Eb) )
-
-head(beta)
+beta <- bayes_regress(response_vec = y
+                      , design_matrix = X
+                      , nu0_val = 2
+                      , s20_val = 1
+                      , nreps = 1000
+                      )
 
 beta_df <- beta %>%
   data.frame()
 
-# Intercept
+# Obtain posterior cofidence intervals for all parameters
 
-qplot(int, data = beta_df, geom = "density"
-      , main = "Intercept Density")
+looper_matrix <- matrix(0, nrow = dim(beta_df)[2], ncol = 3)
 
-(beta_df$int %>%
-  mean() ) - (1.96 * sd(beta_df$int))
+for(i in 1:dim(beta_df)[2])
+{
+  one <- mean(beta_df[,i])
+  two <- mean(beta_df[,i]) - (1.96*sd(beta_df[,i]) )
+  three <- mean(beta_df[,i]) + (1.96*sd(beta_df[,i]) )
+  looper_matrix[i,1] <- one
+  looper_matrix[i,2] <- two
+  looper_matrix[i,3] <- three
+}
 
-(beta_df$int %>%
-   mean() ) + (1.96 * sd(beta_df$int))
-
-# NPREG
-
-qplot(npreg, data = beta_df, geom = "density"
-      , main = "NPREG Density")
-
-(beta_df$npreg %>%
-   mean() ) - (1.96 * sd(beta_df$npreg))
-
-(beta_df$npreg %>%
-   mean() ) + (1.96 * sd(beta_df$npreg))
-
-# BP
-
-qplot(bp, data = beta_df, geom = "density"
-      , main = "BP Density")
-
-(beta_df$bp %>%
-   mean() ) - (1.96 * sd(beta_df$bp))
-
-(beta_df$bp %>%
-   mean() ) + (1.96 * sd(beta_df$bp))
-
-# Skin
-
-qplot(skin, data = beta_df, geom = "density"
-      , main = "Skin Density")
-
-(beta_df$skin %>%
-   mean() ) - (1.96 * sd(beta_df$skin))
-
-(beta_df$skin %>%
-   mean() ) + (1.96 * sd(beta_df$skin))
-
-# BMI
-
-qplot(bmi, data = beta_df, geom = "density"
-      , main = "BMI Density")
-
-(beta_df$bmi %>%
-   mean() ) - (1.96 * sd(beta_df$bmi))
-
-(beta_df$bmi %>%
-   mean() ) + (1.96 * sd(beta_df$bmi))
-
-# PED
-
-qplot(ped, data = beta_df, geom = "density"
-      , main = "PED Density")
-
-(beta_df$ped %>%
-   mean() ) - (1.96 * sd(beta_df$ped))
-
-(beta_df$ped %>%
-   mean() ) + (1.96 * sd(beta_df$ped))
-
-# Age
-
-qplot(age, data = beta_df, geom = "density"
-      , main = "age Density")
-
-(beta_df$age %>%
-   mean() ) - (1.96 * sd(beta_df$age))
-
-(beta_df$age %>%
-   mean() ) + (1.96 * sd(beta_df$age))
+stargazer(cbind(names(beta_df), looper_matrix)
+          , summary = F
+          , type="text"
+          , title = "95% Posterior Confidence Intervals - Diabetes Regression"
+)
 
 
-# 
+# 9.2.b
+
+# Hold off on this one for now
+
+y <- diabetes$glu
+dm <- dplyr::select(diabetes, -glu, -diabetes) %>%
+  as.matrix()
+z <- rep(1,ncol(dm))
+
+out_data <- modelselect(X = dm, y = y, nreps = 1000, z = z)
+
+# Find the probability
+# isolate the z vector from the list output
+
+z <- out_data[[2]]
+
+outer <- rep(0,dim(z)[2])
+for(i in 1:dim(z)[2])
+{
+outer[i] <- mean(z[,i])
+}
+
+rbind(names(data.frame(dm)), outer) %>%
+  data.frame()
+
+
+# now, determining posterior confidence intervals for all parameters
+
+b <- out_data[[1]]
+s <- out_data[[3]]
+
+outer <- matrix(0, nrow = dim(b)[2], ncol = 3)
+for(i in 1:dim(b)[2])
+{
+  outer[i,1] <- mean(b[,i])
+  outer[i,2] <- quantile(b[,i], c(0.025))
+  outer[i,3] <- quantile(b[,i], c(0.975))
+}
+
+dm_m <- make_matrix(diabetes, c(2,8))
+
+output <- cbind(names(data.frame(dm_m)), outer) %>% 
+  data.frame()
+names(output) <- c("variable", "mean", "lower bound", "upper bound")
+output
+
+dim(out_data[[1]])
+
+
+
+head(out_data[[1]], n = 50)
+
+mean(out_data[[1]])
+
+plot(density(out_data[[1]]))
+
+# 9.3.a
+
+# Bring in the data - should already be available within the MASS library
+
+?UScrime # for built-in description of the data
+str(UScrime)
+
+dim(UScrime)
+
+# Fit a regression model using the g-prior with g = n, v0 = 2, sigma20 = 1
+# going to use the same code as with 9.2.a
+
+y <- UScrime$y
+
+X <- make_matrix(dset = UScrime, place = 16)
+
+bayes_out <- bayes_regress(y, X, 2, 1, 1000) %>%
+  data.frame()
+
+
+# Obtain means and confidence intervals and put them in a nice table
+
+filler <- matrix(0, nrow = dim(bayes_out)[2], ncol = 3)
+
+for(i in 1:dim(bayes_out)[2]) 
+  {
+    zero <- mean(bayes_out[,i])
+    one <- mean(bayes_out[,i]) - (1.96 * sd(bayes_out[,i]))
+    two <- mean(bayes_out[,i]) + (1.96 * sd(bayes_out[,i]))
+    filler[i,1] <- zero
+    filler[i,2] <- one
+    filler[i,3] <- two
+  }
+
+name_vec <- names(bayes_out)
+
+filler_df <- cbind(data.frame(filler), name_vec)
+names(filler_df) <- c("Bayes Mean" ,"Bayes LB", "Bayes UB", "variable")
+
+filler_df
+
+
+# Now generate the least squares estimates
+LS_estimates <- (solve(t(X) %*% X)) %*% (t(X) %*% y)
+
+compare_df <- cbind(filler_df, LS_estimates)
+
+stargazer(compare_df
+          , summary = F
+          , type = "text"
+          , title = "Regression Coefficients")
+
+
+### 9.3.b
+
+# Randomly divide the crime set roughly in half, into training and test sets
+
+set.seed(1738)
+sample_sorter <- runif(n = nrow(UScrime), min = 0, max = 1 )
+for_sample <- cbind(UScrime,  sample_sorter)
+
+train <- filter(for_sample, sample_sorter <= 0.5)
+test <- filter(for_sample, sample_sorter > 0.5)
+
+# the immediately below needs to be TRUE
+nrow(train)
+nrow(test)
+(nrow(train) + nrow(test)) == nrow(UScrime)
+
+
+## 9.3.b.i - Using only the training set, obtain least squares regression coefficients
+
+X <- make_matrix(train, c(16,17))
+
+y <- dplyr::select(train, y) %>%
+  data.matrix()
+
+train_beta <- (solve(t(X) %*% X) ) %*%(t(X) %*% y)
+
+# Now that we have the training coefficients, use them to predict the test set
+
+test_dm <- make_matrix(test, c(16,17))
+
+test_y <- dplyr::select(test, y) %>%
+  data.matrix()
+
+# make the prediction
+
+test_pred <- test_dm %*% train_beta
+
+pre_error <- cbind(test_y, test_pred)
+
+plot(test_y, test_pred
+     , main = "Test Set - Predicted vs. Actual" 
+     , xlab = "Actual"
+     , ylab = "Predicted")
+
+(ls_error <- sum((test_y - test_pred) ** 2) / nrow(test_y))
+
+
+## 9.3.b.ii
+# Obtain the posterior means of Beta|y using the g-prior above and only the training data
+
+train_dat <- make_matrix(train, c(16,17))
+
+train_y <- dplyr::select(train, y) %>%
+  data.matrix()
+
+train_bayes <- bayes_regress(train_y, train_dat, 2,1,1000) %>%
+  data.matrix()
+
+train_bayes_means <- matrix(0, nrow = ncol(train_bayes), ncol = 1)
+for(i in 1:ncol(train_bayes))
+  {
+  train_bayes_means[i,1] <- mean(train_bayes[,i])          
+  }
+
+train_bayes_means
+
+# now that we have the training conditional betas, let's score the test set
+
+test_dm <- make_matrix(test, c(16,17) )
+
+test_hat <- test_dm %*% train_bayes_means
+
+# pull in the original y values for the test set
+
+test_actual <- dplyr::select(test, y) %>%
+  as.matrix()
+
+plot(test_hat, test_actual
+     , main = "Test Set - Bayes Predicted vs. Actual"
+     , xlab = "Predicted"
+     , ylab = "Actual"
+     )
+
+# compute the prediction error
+
+(bayes_error <- sum((test_actual - test_hat) ** 2) / nrow(test_actual))
+
+
+# 9.3.c. - repeat the procedure in part B many times, compute the average prediction error
+
+# create a for-loop with 1000 repititions
+
+nreps <- 1000
+looper_mat <- matrix(0, nrow = nreps, ncol = 2)
+
+for(j in 1:nreps)
+{
+set.seed(j)
+sample_sorter <- runif(n = nrow(UScrime), min = 0, max = 1 )
+for_sample <- cbind(UScrime,  sample_sorter)
+
+train <- filter(for_sample, sample_sorter <= 0.6)
+test <- filter(for_sample, sample_sorter > 0.6)
+
+# the immediately below needs to be TRUE
+nrow(train)
+nrow(test)
+(nrow(train) + nrow(test)) == nrow(UScrime)
+
+
+## Using only the training set, obtain least squares regression coefficients
+
+X <- make_matrix(train, c(16,17))
+
+y <- dplyr::select(train, y) %>%
+  data.matrix()
+
+train_beta <- (solve(t(X) %*% X) ) %*%(t(X) %*% y)
+
+# Now that we have the training coefficients, use them to predict the test set
+
+test_dm <- make_matrix(test, c(16,17))
+
+test_y <- dplyr::select(test, y) %>%
+  data.matrix()
+
+# make the prediction
+
+test_pred <- test_dm %*% train_beta
+
+pre_error <- cbind(test_y, test_pred)
+
+(ls_error <- sum((test_y - test_pred) ** 2) / nrow(test_y))
+
+
+## 9.3.b.ii
+# Obtain the posterior means of Beta|y using the g-prior above and only the training data
+
+train_dat <- make_matrix(train, c(16,17))
+
+train_y <- dplyr::select(train, y) %>%
+  data.matrix()
+
+train_bayes <- bayes_regress(train_y, train_dat, 2,1,1000) %>%
+  data.matrix()
+
+train_bayes_means <- matrix(0, nrow = ncol(train_bayes), ncol = 1)
+for(i in 1:ncol(train_bayes))
+{
+  train_bayes_means[i,1] <- mean(train_bayes[,i])          
+}
+
+train_bayes_means
+
+# now that we have the training conditional betas, let's score the test set
+
+test_dm <- make_matrix(test, c(16,17) )
+
+test_hat <- test_dm %*% train_bayes_means
+
+# pull in the original y values for the test set
+
+test_actual <- dplyr::select(test, y) %>%
+  as.matrix()
+
+# compute the prediction error
+
+(bayes_error <- sum((test_actual - test_hat) ** 2) / nrow(test_actual))
+
+looper_mat[j,1] <- ls_error
+looper_mat[j,2] <- bayes_error
+
+}
+
+mean(looper_mat[,1])
+mean(looper_mat[,2])
+
+plot(density(looper_mat[,1])
+     , main = "Error Distributions"
+     , lty = 1)
+lines(density(looper_mat[,2]), lty = 2)
+mtext("LS Error straight, Bayes Error dashed")
+
+test_hat
+
+dim(X)
+dim(beta_means)
+head(beta)
 
 
 
@@ -265,6 +528,8 @@ modelselect=function(X,y,nreps,z){
   #
   list(Beta,Z,Sigma2)
 }
+
+out_data <- modelselect(X = dm, y = y, nreps = 1000, z = 
 
 ### For the impending regression,
 # set up the design matrix, response vector, nreps, and 
